@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/debo/Desktop/CD-LLVM/simple-jit-server/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
