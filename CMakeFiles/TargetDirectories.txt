@@ -1,0 +1,15 @@
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/intrinsics_gen.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/vt_gen.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/omp_gen.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/acc_gen.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/ARMTargetParserTableGen.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/AArch64TargetParserTableGen.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/RISCVTargetParserTableGen.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/jit_compiler.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/python_setup.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/edit_cache.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/rebuild_cache.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/list_install_components.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/install.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/install/local.dir
+/Users/debo/desktop/purrsonal/CD-LLVM/CMakeFiles/install/strip.dir
