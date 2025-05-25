@@ -1,4 +1,0 @@
-/Users/debo/Desktop/CD-LLVM/simple-jit-server/build/CMakeFiles/jit_server.dir
-/Users/debo/Desktop/CD-LLVM/simple-jit-server/build/CMakeFiles/jit_client.dir
-/Users/debo/Desktop/CD-LLVM/simple-jit-server/build/CMakeFiles/edit_cache.dir
-/Users/debo/Desktop/CD-LLVM/simple-jit-server/build/CMakeFiles/rebuild_cache.dir

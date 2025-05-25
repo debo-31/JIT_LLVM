@@ -1,1 +1,0 @@
-/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/jit_server.dir/server.cpp.o CMakeFiles/jit_server.dir/memory_manager.cpp.o CMakeFiles/jit_server.dir/code_generator.cpp.o -o jit_server
