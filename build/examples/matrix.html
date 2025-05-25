@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .matrix-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .matrix {
+            display: grid;
+            grid-template-columns: repeat(2, 60px);
+            gap: 5px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .matrix input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 18px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .operator {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .matrix-label {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Matrix Calculator</h1>
+        <div class="matrix-container">
+            <div>
+                <div class="matrix-label">Matrix A</div>
+                <div class="matrix" id="matrixA">
+                    <input type="number" value="1">
+                    <input type="number" value="2">
+                    <input type="number" value="3">
+                    <input type="number" value="4">
+                </div>
+            </div>
+            <div class="operator">×</div>
+            <div>
+                <div class="matrix-label">Matrix B</div>
+                <div class="matrix" id="matrixB">
+                    <input type="number" value="5">
+                    <input type="number" value="6">
+                    <input type="number" value="7">
+                    <input type="number" value="8">
+                </div>
+            </div>
+            <div class="operator">=</div>
+            <div>
+                <div class="matrix-label">Result</div>
+                <div class="matrix" id="matrixC">
+                    <div>0</div>
+                    <div>0</div>
+                    <div>0</div>
+                    <div>0</div>
+                </div>
+            </div>
+        </div>
+        <button onclick="calculateMatrix()">Calculate</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function getMatrixValues(matrixId) {
+            const inputs = document.querySelectorAll(`#${matrixId} input`);
+            return Array.from(inputs).map(input => parseInt(input.value) || 0);
+        }
+
+        function displayResult(result) {
+            const matrixC = document.getElementById('matrixC');
+            const cells = matrixC.children;
+            for (let i = 0; i < result.length; i++) {
+                cells[i].textContent = result[i];
+            }
+        }
+
+        function calculateMatrix() {
+            const matrixA = getMatrixValues('matrixA');
+            const matrixB = getMatrixValues('matrixB');
+            
+            // Calculate result (2x2 matrix multiplication)
+            const result = [
+                matrixA[0] * matrixB[0] + matrixA[1] * matrixB[2],
+                matrixA[0] * matrixB[1] + matrixA[1] * matrixB[3],
+                matrixA[2] * matrixB[0] + matrixA[3] * matrixB[2],
+                matrixA[2] * matrixB[1] + matrixA[3] * matrixB[3]
+            ];
+            
+            displayResult(result);
+            
+            // Show calculation steps
+            const steps = `
+                <h3>Calculation Steps:</h3>
+                <p>C[0,0] = ${matrixA[0]} × ${matrixB[0]} + ${matrixA[1]} × ${matrixB[2]} = ${result[0]}</p>
+                <p>C[0,1] = ${matrixA[0]} × ${matrixB[1]} + ${matrixA[1]} × ${matrixB[3]} = ${result[1]}</p>
+                <p>C[1,0] = ${matrixA[2]} × ${matrixB[0]} + ${matrixA[3]} × ${matrixB[2]} = ${result[2]}</p>
+                <p>C[1,1] = ${matrixA[2]} × ${matrixB[1]} + ${matrixA[3]} × ${matrixB[3]} = ${result[3]}</p>
+            `;
+            document.getElementById('result').innerHTML = steps;
+        }
+    </script>
+</body>
+</html> 

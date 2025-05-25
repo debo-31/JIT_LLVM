@@ -1,0 +1,1 @@
+/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/jit_compiler.dir/lljit/JITD.cpp.o CMakeFiles/jit_compiler.dir/lljit/main.cpp.o -o jit_compiler  -Wl,-rpath,/opt/homebrew/opt/llvm/lib /opt/homebrew/opt/llvm/lib/libLLVM.dylib
