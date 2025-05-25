@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/debo/Desktop/CD-LLVM/examples/lexical_analysis'
+relocations:     []
+...

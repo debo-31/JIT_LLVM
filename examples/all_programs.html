@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LLVM JIT All Programs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #ccc;
+            padding: 32px;
+        }
+
+        .program-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .program-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .program-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .program-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .button:hover {
+            background: #0056b3;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LLVM JIT Programs</h1>
+        <div class="program-grid">
+            <!-- Game -->
+            <div class="program-card">
+                <h3>Number Guessing Game</h3>
+                <p>A game where you guess a random number between 1 and 100. The program gives hints if your guess is too high or too low.</p>
+                <button class="button" onclick="runProgram('game')">Run Game</button>
+            </div>
+
+            <!-- Calculator -->
+            <div class="program-card">
+                <h3>Calculator</h3>
+                <p>Simple calculator that performs basic arithmetic operations (add, subtract, multiply, divide).</p>
+                <button class="button" onclick="runProgram('calculator')">Run Calculator</button>
+            </div>
+
+            <!-- Factorial -->
+            <div class="program-card">
+                <h3>Factorial Calculator</h3>
+                <p>Calculates the factorial of a given number using recursion.</p>
+                <button class="button" onclick="runProgram('factorial')">Run Factorial</button>
+            </div>
+
+            <!-- Fibonacci -->
+            <div class="program-card">
+                <h3>Fibonacci Series</h3>
+                <p>Generates the Fibonacci sequence up to a specified number of terms.</p>
+                <button class="button" onclick="runProgram('fibonacci')">Run Fibonacci</button>
+            </div>
+
+            <!-- Hello World -->
+            <div class="program-card">
+                <h3>Hello World</h3>
+                <p>A simple program that prints "Hello, World!" to the console.</p>
+                <button class="button" onclick="runProgram('helloworld')">Run Hello World</button>
+            </div>
+
+            <!-- Matrix -->
+            <div class="program-card">
+                <h3>Matrix Operations</h3>
+                <p>Performs matrix addition on two 3x3 matrices.</p>
+                <button class="button" onclick="runProgram('matrix')">Run Matrix</button>
+            </div>
+
+            <!-- Odd Even -->
+            <div class="program-card">
+                <h3>Odd Even Checker</h3>
+                <p>Checks if a given number is odd or even.</p>
+                <button class="button" onclick="runProgram('oddeven')">Run Odd Even</button>
+            </div>
+
+            <!-- Pattern -->
+            <div class="program-card">
+                <h3>Pattern Printer</h3>
+                <p>Prints various patterns using asterisks (*).</p>
+                <button class="button" onclick="runProgram('pattern')">Run Pattern</button>
+            </div>
+
+            <!-- Print Name -->
+            <div class="program-card">
+                <h3>Name Printer</h3>
+                <p>Prints a name in a decorative pattern.</p>
+                <button class="button" onclick="runProgram('printname')">Run Name Printer</button>
+            </div>
+
+            <!-- Reverse -->
+            <div class="program-card">
+                <h3>Number Reverser</h3>
+                <p>Reverses the digits of a given number.</p>
+                <button class="button" onclick="runProgram('reverse')">Run Reverse</button>
+            </div>
+
+            <!-- Sum of Digits -->
+            <div class="program-card">
+                <h3>Sum of Digits</h3>
+                <p>Calculates the sum of digits in a given number.</p>
+                <button class="button" onclick="runProgram('sumdigits_input')">Run Sum of Digits</button>
+            </div>
+
+            <!-- GCD -->
+            <div class="program-card">
+                <h3>GCD Calculator</h3>
+                <p>Calculates the Greatest Common Divisor of two numbers.</p>
+                <button class="button" onclick="runProgram('gcd')">Run GCD</button>
+            </div>
+
+            <!-- Palindrome -->
+            <div class="program-card">
+                <h3>Palindrome Checker</h3>
+                <p>Checks if a given number is a palindrome.</p>
+                <button class="button" onclick="runProgram('palindrome')">Run Palindrome</button>
+            </div>
+
+            <!-- Multiplication Table -->
+            <div class="program-card">
+                <h3>Multiplication Table</h3>
+                <p>Generates the multiplication table for a given number.</p>
+                <button class="button" onclick="runProgram('multiplication_table')">Run Table</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function runProgram(programName) {
+            // This function will be implemented to run the selected program
+            // For now, it just shows an alert
+            alert(`Running ${programName} program...`);
+            // TODO: Implement actual program execution
+        }
+    </script>
+</body>
+</html> 

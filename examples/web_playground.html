@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LLVM JIT Web Playground</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px #ccc;
+      padding: 32px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 320px;
+      font-family: 'Fira Mono', monospace;
+      font-size: 15px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+
+    button {
+      margin: 8px;
+      padding: 10px 18px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: none;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .analysis-button {
+      background: #28a745;
+    }
+
+    .analysis-button:hover {
+      background: #218838;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    pre {
+      background: #222;
+      color: #0f0;
+      padding: 12px;
+      border-radius: 4px;
+      min-height: 60px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .filename,
+    .input-data {
+      margin-top: 12px;
+      width: 100%;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    .input-label {
+      display: block;
+      margin-top: 12px;
+      color: #666;
+    }
+
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .analysis-container {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .token {
+      display: inline-block;
+      margin: 4px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: #e9ecef;
+      font-family: monospace;
+    }
+
+    .token-constant { background: #cce5ff; color: #003366; font-weight: bold; }
+    .token-identifier { background: #e2e3ff; color: #3a3a7a; }
+    .token-keyword { background: #ffe0b2; color: #b26a00; font-weight: bold; }
+    .token-string { background: #d1ffd1; color: #006600; }
+    .token-char { background: #ffe6f2; color: #b30059; }
+    .token-operator { background: #f0e68c; color: #8b8000; }
+    .token-preprocessor { background: #e0e0e0; color: #005580; font-weight: bold; }
+    .token-comment { background: #f5f5f5; color: #888; font-style: italic; }
+    .token-brace { background: #f9d5ec; color: #a8326e; }
+    .token-bracket { background: #d5f9f6; color: #327a6d; }
+    .token-paren { background: #fff3cd; color: #856404; }
+    .token-semicolon { background: #e6e6e6; color: #333; }
+    .token-colon { background: #e6e6e6; color: #333; }
+    .token-comma { background: #e6e6e6; color: #333; }
+    .token-error { background: #d32f2f; color: #fff; font-weight: bold; }
+    .token-stdlib { background: #e0f7fa; color: #00796b; font-weight: bold; }
+    .ast-tree {
+      font-family: 'Fira Mono', 'Consolas', monospace;
+      background: #222;
+      color: #fff;
+      padding: 16px;
+      border-radius: 4px;
+      white-space: pre;
+      margin-top: 10px;
+    }
+    .ast-operator { color: #ffe082; }
+    .ast-number { color: #80cbc4; }
+    .ast-leaf { color: #b2ff59; }
+    .ast-if { color: #ffb74d; font-weight: bold; }
+    .ast-else { color: #ff8a65; font-weight: bold; }
+    .ast-for { color: #64b5f6; font-weight: bold; }
+    .ast-while { color: #81c784; font-weight: bold; }
+    .ast-do { color: #ba68c8; font-weight: bold; }
+    .ast-return { color: #ffd54f; font-weight: bold; }
+    .ast-collapsible { cursor: pointer; }
+    .ast-collapsed > .ast-children { display: none; }
+    .ast-error {
+      background: #ffebee;
+      color: #c62828;
+      border-left: 4px solid #c62828;
+      padding-left: 4px;
+    }
+    .syntax-errors-box {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 12px;
+      font-family: 'Fira Mono', monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>LLVM JIT Web Playground</h1>
+    <input class="filename" id="filename" type="text" placeholder="Enter filename (e.g. myprog)" value="myprog" />
+    
+    <div class="button-container">
+      <button onclick="loadCode('default')">Prime Checker</button>
+      <button onclick="loadCode('unique')">Unique Elements</button>
+      <button onclick="loadCode('game')">Number Guessing Game</button>
+      <button onclick="loadCode('calculator')">Calculator</button>
+      <button onclick="loadCode('factorial')">Factorial</button>
+      <button onclick="loadCode('fibonacci')">Fibonacci</button>
+      <button onclick="loadCode('generatesum')">Generate Sum</button>
+      <button onclick="loadCode('helloworld')">Hello World</button>
+      <button onclick="loadCode('matrix')">Matrix</button>
+      <button onclick="loadCode('oddeven')">Odd Even</button>
+      <button onclick="loadCode('pattern')">Pattern</button>
+      <button onclick="loadCode('printinitials')">Print Initials</button>
+      <button onclick="loadCode('printname')">Print Name</button>
+      <button onclick="loadCode('reverse')">Reverse</button>
+      <button onclick="loadCode('sumdigits')">Sum of Digits</button>
+      <button onclick="loadCode('gcd')">GCD</button>
+      <button onclick="loadCode('palindrome')">Palindrome</button>
+      <button onclick="loadCode('multiplication')">Multiplication Table</button>
+    </div>
+
+    <textarea id="code" spellcheck="false">// Select an example from the buttons above or write your own code!</textarea>
+    
+    <div class="button-container">
+      <button onclick="runCode()">Run Code</button>
+      <button class="analysis-button" onclick="performLexicalAnalysis()">Lexical Analysis</button>
+      <button class="analysis-button" onclick="performSyntaxAnalysis()">Syntax Analysis</button>
+    </div>
+
+    <label class="input-label" for="input-data">Program Input:</label>
+    <input class="input-data" id="input-data" type="text" placeholder="Enter program input here" />
+    
+    <div class="analysis-container" id="analysis-output">
+      <h3>Analysis Results:</h3>
+      <div id="tokens"></div>
+      <pre id="syntax-tree"></pre>
+    </div>
+
+    <h3>Output:</h3>
+    <pre id="output"></pre>
+  </div>
+
+  <script>
+    let currentSession = null;
+    let isWaitingForInput = false;
+
+    const codeExamples = {
+      default: `// Prime Number Checker
+// Input: Enter a number in the input field (e.g., 17)
+#include <stdio.h>
+
+void jitentry() {
+    int num;
+    scanf("%d", &num);
+    if (num <= 1) {
+        printf("%d is not a prime number.\\n", num);
+        return;
+    }
+    for (int i = 2; i * i <= num; i++) {
+        if (num % i == 0) {
+            printf("%d is not a prime number.\\n", num);
+            return;
+        }
+    }
+    printf("%d is a prime number.\\n", num);
+}`,
+
+      unique: `// Unique Elements in Array
+// Input: First enter size of array, then enter array elements
+// Example: 5 1 2 2 3 4
+#include <stdio.h>
+
+void jitentry() {
+    int n, arr[100], i, j, isUnique;
+    scanf("%d", &n);
+    for (i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+    printf("Unique elements: ");
+    for (i = 0; i < n; i++) {
+        isUnique = 1;
+        for (j = 0; j < i; j++) {
+            if (arr[i] == arr[j]) {
+                isUnique = 0;
+                break;
+            }
+        }
+        if (isUnique) {
+            printf("%d ", arr[i]);
+        }
+    }
+    printf("\\n");
+}`,
+
+      generatesum: `// Sum of First N Natural Numbers
+// Input: Enter a number
+// Example: 5
+#include <stdio.h>
+
+void jitentry() {
+    int n, sum = 0;
+    scanf("%d", &n);
+    for (int i = 1; i <= n; i++) {
+        sum += i;
+    }
+    printf("Sum of first %d natural numbers is %d\\n", n, sum);
+}`,
+
+      printinitials: `// Print Initials from Full Name
+// Input: Enter your full name
+// Example: John Doe Smith
+#include <stdio.h>
+
+void jitentry() {
+    char name[100];
+    scanf("%[^\\n]s", name);
+    printf("Initials: %c", name[0]);
+    for (int i = 1; name[i] != '\\0'; i++) {
+        if (name[i-1] == ' ') {
+            printf(".%c", name[i]);
+        }
+    }
+    printf("\\n");
+}`,
+
+      game: `// Number Guessing Game
+// Input: Enter your guesses separated by spaces
+// Example: 50 75 25 60 55
+// The game will tell you if each guess is too high or too low
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void jitentry() {
+    int secret, guess;
+    srand(time(NULL));
+    secret = rand() % 100 + 1;
+    printf("I'm thinking of a number between 1 and 100.\\n");
+    
+    while (scanf("%d", &guess) == 1) {
+        if (guess < secret) {
+            printf("%d is too low!\\n", guess);
+        } else if (guess > secret) {
+            printf("%d is too high!\\n", guess);
+        } else {
+            printf("%d is correct! You win!\\n", guess);
+            return;
+        }
+    }
+    printf("Game over! The number was %d\\n", secret);
+}`,
+
+      calculator: `// Simple Calculator
+// Input: Enter two numbers and operation choice (1-4)
+// Example: 10 5 1 (for 10 + 5)
+// 1: Add, 2: Subtract, 3: Multiply, 4: Divide
+#include <stdio.h>
+
+void jitentry() {
+    int a, b, choice;
+    scanf("%d %d %d", &a, &b, &choice);
+    switch (choice) {
+        case 1: printf("Result: %d\\n", a + b); break;
+        case 2: printf("Result: %d\\n", a - b); break;
+        case 3: printf("Result: %d\\n", a * b); break;
+        case 4: printf("Result: %.2f\\n", (float)a / b); break;
+        default: printf("Invalid choice\\n");
+    }
+}`,
+
+      factorial: `// Factorial Calculator
+// Input: Enter a number
+// Example: 5
+#include <stdio.h>
+
+int factorial(int n) {
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
+}
+
+void jitentry() {
+    int n;
+    scanf("%d", &n);
+    printf("Factorial of %d is %d\\n", n, factorial(n));
+}`,
+
+      fibonacci: `// Fibonacci Series Generator
+// Input: Enter number of terms
+// Example: 8
+#include <stdio.h>
+
+int fibonacci(int n) {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+void jitentry() {
+    int n;
+    scanf("%d", &n);
+    printf("Fibonacci Series: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", fibonacci(i));
+    }
+    printf("\\n");
+}`,
+
+      helloworld: `// Hello World
+// No input required
+#include <stdio.h>
+
+void jitentry() {
+    printf("Hello, World!\\n");
+}`,
+
+      matrix: `// Matrix Addition (3x3)
+// Input: Enter 9 numbers for first matrix, then 9 for second matrix
+// Example: 1 2 3 4 5 6 7 8 9 9 8 7 6 5 4 3 2 1
+#include <stdio.h>
+
+void jitentry() {
+    int mat1[3][3], mat2[3][3], sum[3][3];
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            scanf("%d", &mat1[i][j]);
+        }
+    }
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            scanf("%d", &mat2[i][j]);
+        }
+    }
+    printf("Sum of matrices:\\n");
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            sum[i][j] = mat1[i][j] + mat2[i][j];
+            printf("%d ", sum[i][j]);
+        }
+        printf("\\n");
+    }
+}`,
+
+      oddeven: `// Odd Even Checker
+// Input: Enter a number
+// Example: 7
+#include <stdio.h>
+
+void jitentry() {
+    int num;
+    scanf("%d", &num);
+    if (num % 2 == 0) {
+        printf("%d is even\\n", num);
+    } else {
+        printf("%d is odd\\n", num);
+    }
+}`,
+
+      pattern: `// Star Pattern Printer
+// Input: Enter number of rows
+// Example: 5
+#include <stdio.h>
+
+void jitentry() {
+    int n;
+    scanf("%d", &n);
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= i; j++) {
+            printf("* ");
+        }
+        printf("\\n");
+    }
+}`,
+
+      printname: `// Print Name
+// Input: Enter your name
+// Example: John
+#include <stdio.h>
+
+void jitentry() {
+    char name[100];
+    scanf("%99s", name);
+    printf("Hello, %s!\\n", name);
+}`,
+
+      reverse: `// Number Reverser
+// Input: Enter a number
+// Example: 12345
+#include <stdio.h>
+
+void jitentry() {
+    int num, reversed = 0, remainder;
+    scanf("%d", &num);
+    while (num != 0) {
+        remainder = num % 10;
+        reversed = reversed * 10 + remainder;
+        num /= 10;
+    }
+    printf("Reversed number: %d\\n", reversed);
+}`,
+
+      sumdigits: `// Sum of Digits Calculator
+// Input: Enter a number
+// Example: 12345
+#include <stdio.h>
+
+void jitentry() {
+    int num, sum = 0;
+    scanf("%d", &num);
+    while (num != 0) {
+        sum += num % 10;
+        num /= 10;
+    }
+    printf("Sum of digits: %d\\n", sum);
+}`,
+
+      gcd: `// Greatest Common Divisor Calculator
+// Input: Enter two numbers
+// Example: 48 18
+#include <stdio.h>
+
+void jitentry() {
+    int num1, num2;
+    scanf("%d %d", &num1, &num2);
+    
+    if (num1 < num2) {
+        int temp = num1;
+        num1 = num2;
+        num2 = temp;
+    }
+    
+    while (num2 != 0) {
+        int remainder = num1 % num2;
+        num1 = num2;
+        num2 = remainder;
+    }
+    
+    printf("GCD is: %d\\n", num1);
+}`,
+
+      palindrome: `// Palindrome Number Checker
+// Input: Enter a number
+// Example: 12321
+#include <stdio.h>
+
+void jitentry() {
+    int num, originalNum, reversedNum = 0, remainder;
+    scanf("%d", &num);
+    originalNum = num;
+    
+    while (num != 0) {
+        remainder = num % 10;
+        reversedNum = reversedNum * 10 + remainder;
+        num /= 10;
+    }
+    
+    if (originalNum == reversedNum) {
+        printf("%d is a palindrome.\\n", originalNum);
+    } else {
+        printf("%d is not a palindrome.\\n", originalNum);
+    }
+}`,
+
+      multiplication: `// Multiplication Table Generator
+// Input: Enter a number
+// Example: 5
+#include <stdio.h>
+
+void jitentry() {
+    int num, i;
+    scanf("%d", &num);
+    
+    printf("\\nMultiplication Table for %d:\\n", num);
+    printf("------------------------\\n");
+    
+    for (i = 1; i <= 10; i++) {
+        printf("%d x %d = %d\\n", num, i, num * i);
+    }
+}`
+    };
+
+    function loadCode(example) {
+      document.getElementById('code').value = codeExamples[example];
+    }
+
+    async function runCode() {
+      const code = document.getElementById('code').value;
+      const filename = document.getElementById('filename').value.trim() || 'myprog';
+      const inputData = document.getElementById('input-data').value + '\\n';
+      const formData = new FormData();
+      formData.append('code', code);
+      formData.append('filename', filename);
+      formData.append('input_data', inputData);
+      document.getElementById('output').textContent = 'Running...';
+      try {
+        const resp = await fetch('http://localhost:8001/run_c_code', {
+          method: 'POST',
+          body: formData
+        });
+        const text = await resp.text();
+        document.getElementById('output').textContent = text;
+      } catch (e) {
+        document.getElementById('output').textContent = 'Error: ' + e;
+      }
+    }
+
+    function performLexicalAnalysis() {
+      const code = document.getElementById('code').value;
+      const tokens = [];
+      let position = 0;
+      
+      // Token types
+      const TOKEN_TYPES = {
+        CONSTANT: 'CONSTANT',
+        IDENTIFIER: 'IDENTIFIER',
+        KEYWORD: 'KEYWORD',
+        STRING: 'STRING',
+        CHAR: 'CHAR',
+        COMMENT: 'COMMENT',
+        PREPROCESSOR: 'PREPROCESSOR',
+        OPERATOR: 'OPERATOR',
+        PAREN: 'PAREN',
+        BRACE: 'BRACE',
+        BRACKET: 'BRACKET',
+        SEMICOLON: 'SEMICOLON',
+        COLON: 'COLON',
+        COMMA: 'COMMA',
+        ERROR: 'ERROR'
+      };
+
+      // Keywords (all 32 C keywords)
+      const KEYWORDS = new Set([
+        'auto', 'break', 'case', 'char', 'const', 'continue', 'default', 'do', 'double', 'else', 'enum', 'extern',
+        'float', 'for', 'goto', 'if', 'int', 'long', 'register', 'return', 'short', 'signed', 'sizeof', 'static',
+        'struct', 'switch', 'typedef', 'union', 'unsigned', 'void', 'volatile', 'while'
+      ]);
+      // Standard library functions (highlight if desired)
+      const STDLIB_FUNCS = new Set(['scanf', 'printf']);
+
+      // Operators
+      const OPERATORS = new Set([
+        '+', '-', '*', '/', '%', '=', '==', '!=', '<', '>', '<=', '>=', '++', '--', '->', '.', '&', '|', '^', '~', '!', '&&', '||', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<', '>>', '<<=', '>>=', '?', ':'
+      ]);
+
+      while (position < code.length) {
+        // Skip whitespace
+        if (/\s/.test(code[position])) {
+          position++;
+          continue;
+        }
+
+        // Preprocessor directives
+        if (code[position] === '#') {
+          let preproc = '';
+          while (position < code.length && code[position] !== '\n') {
+            preproc += code[position];
+            position++;
+          }
+          tokens.push({ type: TOKEN_TYPES.PREPROCESSOR, value: preproc });
+          continue;
+        }
+
+        // Single-line comments
+        if (code[position] === '/' && code[position + 1] === '/') {
+          let comment = '';
+          while (position < code.length && code[position] !== '\n') {
+            comment += code[position];
+            position++;
+          }
+          tokens.push({ type: TOKEN_TYPES.COMMENT, value: comment });
+          continue;
+        }
+
+        // Multi-line comments
+        if (code[position] === '/' && code[position + 1] === '*') {
+          let comment = '';
+          position += 2;
+          while (position < code.length && !(code[position] === '*' && code[position + 1] === '/')) {
+            comment += code[position];
+            position++;
+          }
+          position += 2;
+          tokens.push({ type: TOKEN_TYPES.COMMENT, value: '/*' + comment + '*/' });
+          continue;
+        }
+
+        // String literals
+        if (code[position] === '"') {
+          let string = '"';
+          position++;
+          while (position < code.length && code[position] !== '"') {
+            string += code[position];
+            position++;
+          }
+          if (position < code.length) {
+            string += '"';
+            tokens.push({ type: TOKEN_TYPES.STRING, value: string });
+            position++;
+          } else {
+            tokens.push({ type: TOKEN_TYPES.ERROR, value: 'Unterminated string' });
+          }
+          continue;
+        }
+
+        // Char literals
+        if (code[position] === "'") {
+          let charlit = "'";
+          position++;
+          while (position < code.length && code[position] !== "'") {
+            charlit += code[position];
+            position++;
+          }
+          if (position < code.length) {
+            charlit += "'";
+            tokens.push({ type: TOKEN_TYPES.CHAR, value: charlit });
+            position++;
+          } else {
+            tokens.push({ type: TOKEN_TYPES.ERROR, value: 'Unterminated char literal' });
+          }
+          continue;
+        }
+
+        // Numbers (int and float)
+        if (/\d/.test(code[position])) {
+          let number = '';
+          let isFloat = false;
+          while (position < code.length && /[\d\.]/.test(code[position])) {
+            if (code[position] === '.') isFloat = true;
+            number += code[position];
+            position++;
+          }
+          tokens.push({ type: TOKEN_TYPES.CONSTANT, value: number });
+          continue;
+        }
+
+        // Identifiers and keywords
+        if (/[a-zA-Z_]/.test(code[position])) {
+          let identifier = '';
+          while (position < code.length && /[a-zA-Z0-9_]/.test(code[position])) {
+            identifier += code[position];
+            position++;
+          }
+          if (KEYWORDS.has(identifier)) {
+            tokens.push({ type: TOKEN_TYPES.KEYWORD, value: identifier });
+          } else if (STDLIB_FUNCS.has(identifier)) {
+            tokens.push({ type: 'STDLIB', value: identifier });
+          } else {
+            tokens.push({ type: TOKEN_TYPES.IDENTIFIER, value: identifier });
+          }
+          continue;
+        }
+
+        // Multi-character operators
+        let opFound = false;
+        for (let opLen = 3; opLen > 0; opLen--) {
+          let op = code.substr(position, opLen);
+          if (OPERATORS.has(op)) {
+            tokens.push({ type: TOKEN_TYPES.OPERATOR, value: op });
+            position += opLen;
+            opFound = true;
+            break;
+          }
+        }
+        if (opFound) continue;
+
+        // Parentheses
+        if (code[position] === '(' || code[position] === ')') {
+          tokens.push({ type: TOKEN_TYPES.PAREN, value: code[position] });
+          position++;
+          continue;
+        }
+        // Braces
+        if (code[position] === '{' || code[position] === '}') {
+          tokens.push({ type: TOKEN_TYPES.BRACE, value: code[position] });
+          position++;
+          continue;
+        }
+        // Brackets
+        if (code[position] === '[' || code[position] === ']') {
+          tokens.push({ type: TOKEN_TYPES.BRACKET, value: code[position] });
+          position++;
+          continue;
+        }
+        // Semicolon
+        if (code[position] === ';') {
+          tokens.push({ type: TOKEN_TYPES.SEMICOLON, value: ';' });
+          position++;
+          continue;
+        }
+        // Colon
+        if (code[position] === ':') {
+          tokens.push({ type: TOKEN_TYPES.COLON, value: ':' });
+          position++;
+          continue;
+        }
+        // Comma
+        if (code[position] === ',') {
+          tokens.push({ type: TOKEN_TYPES.COMMA, value: ',' });
+          position++;
+          continue;
+        }
+
+        // Unknown character
+        tokens.push({ type: TOKEN_TYPES.ERROR, value: `Unknown character: ${code[position]}` });
+        position++;
+      }
+
+      // Display tokens
+      const tokensDiv = document.getElementById('tokens');
+      tokensDiv.innerHTML = '';
+      tokens.forEach(token => {
+        const tokenElement = document.createElement('span');
+        tokenElement.className = `token token-${token.type.toLowerCase()}`;
+        tokenElement.textContent = `${token.type}: ${token.value}`;
+        tokensDiv.appendChild(tokenElement);
+      });
+
+      // Show analysis container
+      document.getElementById('analysis-output').style.display = 'block';
+    }
+
+    function performSyntaxAnalysis() {
+      const code = document.getElementById('code').value;
+      const syntaxTree = document.getElementById('syntax-tree');
+      // Improved AST construction: nest statements inside functions and blocks
+      let ast = [];
+      let currentFunc = null;
+      let currentBlock = null;
+      const blockStack = [];
+      const lines = code.split('\n');
+      // Track error lines
+      const errorLines = new Set();
+      for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+        let line = lines[lineIdx];
+        let trimmed = line.trim();
+        if (!trimmed) continue;
+        if (trimmed.startsWith('#')) {
+          ast.push({ type: 'Preprocessor', value: trimmed, line: lineIdx });
+        } else if (/^\w+\s+\w+\s*\(.*\)\s*\{?$/.test(trimmed)) {
+          currentFunc = { type: 'FunctionDef', value: trimmed, children: [], line: lineIdx };
+          ast.push(currentFunc);
+          currentBlock = currentFunc;
+          blockStack.push(currentBlock);
+        } else if (/^}/.test(trimmed)) {
+          blockStack.pop();
+          currentBlock = blockStack[blockStack.length - 1] || null;
+          if (blockStack.length === 0) currentFunc = null;
+        } else if (/^if\s*\(.*\)/.test(trimmed)) {
+          const node = { type: 'IfStatement', value: trimmed, children: [], line: lineIdx };
+          if (currentBlock) currentBlock.children.push(node);
+          else ast.push(node);
+          currentBlock = node;
+          blockStack.push(currentBlock);
+        } else if (/^else(\s*if\s*\(.*\))?/.test(trimmed)) {
+          const node = { type: 'ElseStatement', value: trimmed, children: [], line: lineIdx };
+          if (currentBlock) currentBlock.children.push(node);
+          else ast.push(node);
+          currentBlock = node;
+          blockStack.push(currentBlock);
+        } else if (/^for\s*\(.*\)/.test(trimmed)) {
+          const node = { type: 'ForLoop', value: trimmed, children: [], line: lineIdx };
+          if (currentBlock) currentBlock.children.push(node);
+          else ast.push(node);
+          currentBlock = node;
+          blockStack.push(currentBlock);
+        } else if (/^while\s*\(.*\)/.test(trimmed)) {
+          const node = { type: 'WhileLoop', value: trimmed, children: [], line: lineIdx };
+          if (currentBlock) currentBlock.children.push(node);
+          else ast.push(node);
+          currentBlock = node;
+          blockStack.push(currentBlock);
+        } else if (/^do\b/.test(trimmed)) {
+          const node = { type: 'DoWhileLoop', value: trimmed, children: [], line: lineIdx };
+          if (currentBlock) currentBlock.children.push(node);
+          else ast.push(node);
+          currentBlock = node;
+          blockStack.push(currentBlock);
+        } else if (/^return\b/.test(trimmed)) {
+          const node = { type: 'ReturnStatement', value: trimmed, line: lineIdx };
+          if (currentBlock) currentBlock.children.push(node);
+          else ast.push(node);
+        } else if (/^\w+\s+\w+\s*(=\s*.+)?;?$/.test(trimmed)) {
+          const node = { type: 'VarDecl', value: trimmed, line: lineIdx };
+          if (currentBlock) currentBlock.children.push(node);
+          else ast.push(node);
+        } else if (/^\w+\s*=\s*.+;?$/.test(trimmed)) {
+          const node = { type: 'Assignment', value: trimmed, line: lineIdx };
+          if (currentBlock) currentBlock.children.push(node);
+          else ast.push(node);
+        } else {
+          const node = { type: 'Statement', value: trimmed, line: lineIdx };
+          if (currentBlock) currentBlock.children.push(node);
+          else ast.push(node);
+        }
+      }
+      // Error collection
+      let errors = [];
+      let braceCount = 0;
+      for (let i = 0; i < code.length; i++) {
+        if (code[i] === '{') braceCount++;
+        if (code[i] === '}') braceCount--;
+        if (braceCount < 0) {
+          errors.push({line: '?', msg: `Unmatched closing brace at position ${i}`});
+          break;
+        }
+      }
+      if (braceCount > 0) {
+        errors.push({line: '?', msg: 'Unmatched opening brace(s)'});
+      }
+      lines.forEach((line, index) => {
+        if (line.trim() && !line.trim().endsWith(';') && 
+            !line.trim().endsWith('{') && 
+            !line.trim().endsWith('}') &&
+            !line.trim().startsWith('#') &&
+            !line.trim().startsWith('//')) {
+          errors.push({line: index + 1, msg: 'Missing semicolon'});
+          errorLines.add(index);
+        }
+      });
+      // Recursive pretty tree renderer with error highlighting
+      function renderASTTree(nodes, prefix = '', isLast = true) {
+        let tree = '';
+        nodes.forEach((node, idx) => {
+          const last = idx === nodes.length - 1;
+          let line = prefix + (isLast ? '└── ' : '├── ');
+          let nodeClass = '';
+          if (node.type === 'Assignment' || node.type === 'FunctionDef') nodeClass = 'ast-operator';
+          if (node.type === 'VarDecl') nodeClass = 'ast-leaf';
+          if (node.type === 'Preprocessor') nodeClass = 'ast-number';
+          if (node.type === 'IfStatement') nodeClass = 'ast-if';
+          if (node.type === 'ElseStatement') nodeClass = 'ast-else';
+          if (node.type === 'ForLoop') nodeClass = 'ast-for';
+          if (node.type === 'WhileLoop') nodeClass = 'ast-while';
+          if (node.type === 'DoWhileLoop') nodeClass = 'ast-do';
+          if (node.type === 'ReturnStatement') nodeClass = 'ast-return';
+          let hasChildren = node.children && node.children.length > 0;
+          let collapsible = hasChildren ? 'ast-collapsible' : '';
+          let errorClass = errorLines.has(node.line) ? 'ast-error' : '';
+          line += `<span class="${nodeClass} ${collapsible} ${errorClass}" onclick="this.parentNode.classList.toggle('ast-collapsed')">${node.type}: ${node.value}${typeof node.line === 'number' ? ' (line ' + (node.line+1) + ')' : ''}</span>\n`;
+          tree += `<div>${line}`;
+          if (hasChildren) {
+            const childPrefix = prefix + (isLast ? '    ' : '│   ');
+            tree += `<div class="ast-children">` + renderASTTree(node.children, childPrefix, false) + `</div>`;
+          }
+          tree += `</div>`;
+        });
+        return tree;
+      }
+      let tree = '<div class="ast-tree">' + renderASTTree(ast) + '</div>';
+      if (errors.length > 0) {
+        tree += '<div class="syntax-errors-box">Syntax Errors:<br>' + errors.map(e => `Line ${e.line}: ${e.msg}`).join('<br>') + '</div>';
+      }
+      syntaxTree.innerHTML = tree;
+      document.getElementById('analysis-output').style.display = 'block';
+    }
+    // Live AST update as user types
+    document.getElementById('code').addEventListener('input', () => {
+      performSyntaxAnalysis();
+    });
+  </script>
+</body>
+</html>
